@@ -2,9 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { RouterModule, Routes } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TypeOrmConfigService } from './config/typeorm.config.service';
-
 import { AuthModule } from './auth/auth.module';
+import { TypeOrmConfigService } from './config/typeorm.config.service';
 import { UsersModule } from './users/users.module';
 
 const routes: Routes = [

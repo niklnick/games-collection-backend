@@ -1,5 +1,7 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { compare, genSalt, hash } from 'bcrypt';
 import { ReadUserDto } from 'src/users/dto/read-user.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -9,16 +11,25 @@ import { SignupDto } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
-    constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) { }
+    constructor(
+        @InjectRepository(User) private readonly usersRepository: Repository<User>,
+        private readonly jwtService: JwtService
+    ) { }
 
     async signup(signupDto: SignupDto): Promise<AuthDto> {
         if (await this.usersRepository.findOne({
             where: { email: signupDto.email }
         })) throw new ConflictException();
 
-        const user: User = this.usersRepository.create(signupDto);
+        const user: User = this.usersRepository.create({
+            password: (await hash(signupDto.password, (await genSalt()))),
+            ...signupDto
+        });
 
-        return { user: new ReadUserDto(await this.usersRepository.save(user)) };
+        return {
+            user: new ReadUserDto(await this.usersRepository.save(user)),
+            token: await this.jwtService.signAsync({ sub: user.id })
+        };
     }
 
     async login(loginDto: LoginDto): Promise<AuthDto> {
@@ -27,8 +38,11 @@ export class AuthService {
         });
 
         if (!user) throw new NotFoundException();
-        else if (loginDto.password !== user.password) throw new UnauthorizedException();
+        else if (!await compare(loginDto.password, user.password)) throw new UnauthorizedException();
 
-        return { user: new ReadUserDto(user) };
+        return {
+            user: new ReadUserDto(user),
+            token: await this.jwtService.signAsync({ sub: user.id })
+        };
     }
 }
