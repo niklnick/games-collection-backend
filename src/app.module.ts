@@ -4,12 +4,17 @@ import { RouterModule, Routes } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmConfigService } from './config/typeorm.config.service';
+import { GamesModule } from './games/games.module';
 import { UsersModule } from './users/users.module';
 
 const routes: Routes = [
   {
     path: 'auth',
     module: AuthModule
+  },
+  {
+    path: 'games',
+    module: GamesModule
   },
   {
     path: 'users',
@@ -23,7 +28,8 @@ const routes: Routes = [
     RouterModule.register(routes),
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     AuthModule,
-    UsersModule,
+    GamesModule,
+    UsersModule
   ]
 })
 export class AppModule { }

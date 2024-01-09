@@ -10,12 +10,21 @@ export class UsersService {
   constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) { }
 
   async findAll(): Promise<ReadUserDto[]> {
-    return (await this.usersRepository.find()).map((user: User) => new ReadUserDto(user));
+    return (await this.usersRepository.find({
+      relations: {
+        createdGames: true,
+        likedGames: true
+      }
+    })).map((user: User) => new ReadUserDto(user));
   }
 
   async findOne(id: string): Promise<ReadUserDto> {
     const user: User | null = await this.usersRepository.findOne({
-      where: { id: id }
+      where: { id: id },
+      relations: {
+        createdGames: true,
+        likedGames: true
+      }
     });
 
     if (!user) throw new NotFoundException();
