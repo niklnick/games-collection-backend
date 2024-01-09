@@ -22,8 +22,8 @@ export class AuthService {
         })) throw new ConflictException();
 
         const user: User = this.usersRepository.create({
-            password: (await hash(signupDto.password, (await genSalt()))),
-            ...signupDto
+            ...signupDto,
+            password: (await hash(signupDto.password, (await genSalt())))
         });
 
         return {
