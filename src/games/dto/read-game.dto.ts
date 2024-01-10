@@ -39,7 +39,7 @@ export class ReadGameDto {
                 last: game.creator.lastName
             }
         }
-        this.likes = game.likes.map((user: User) => {
+        this.likes = game.likes?.map((user: User) => {
             return {
                 id: user.id,
                 email: user.email,

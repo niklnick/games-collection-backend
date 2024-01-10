@@ -23,13 +23,13 @@ export class ReadUserDto {
             first: user.firstName,
             last: user.lastName
         }
-        this.createdGames = user.createdGames.map((game: Game) => {
+        this.createdGames = user.createdGames?.map((game: Game) => {
             return {
                 id: game.id,
                 title: game.title
             }
         });
-        this.likedGames = user.likedGames.map((game: Game) => {
+        this.likedGames = user.likedGames?.map((game: Game) => {
             return {
                 id: game.id,
                 title: game.title
